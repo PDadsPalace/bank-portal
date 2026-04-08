@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HHSW Check Request Portal</title>
+    <style>
+        /* UI Layout Styles */
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            margin: 0; 
+            display: flex; 
+            height: 100vh; 
+            background: #f0f2f5; 
+            overflow: hidden;
+        }
+        
+        /* Input Sidebar */
+        .input-panel { 
+            width: 380px; 
+            background: white; 
+            padding: 30px; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+            z-index: 10; 
+            overflow-y: auto; 
+            display: flex;
+            flex-direction: column;
+        }
+        
+        h2 { color: #1a3a5a; border-bottom: 3px solid #1a3a5a; padding-bottom: 10px; margin-top: 0; font-size: 20px; }
+        .instructions { font-size: 13px; color: #666; margin-bottom: 20px; line-height: 1.4; }
+        
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 11px; font-weight: bold; color: #1a3a5a; text-transform: uppercase; margin-bottom: 5px; }
+        input, textarea { 
+            width: 100%; 
+            padding: 10px; 
+            border: 2px solid #e1e4e8; 
+            border-radius: 6px; 
+            box-sizing: border-box; 
+            font-size: 14px;
+        }
+        
+        .print-btn { 
+            background: #28a745; 
+            color: white; 
+            border: none; 
+            padding: 18px; 
+            width: 100%; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 16px; 
+            margin-top: 20px;
+        }
+        .print-btn:hover { background: #218838; }
+
+        /* Preview Area */
+        .preview-panel { 
+            flex-grow: 1; 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start; 
+            padding: 40px; 
+            overflow-y: auto; 
+            background: #525659; 
+        }
+
+        /* The Document - EXACT GOOGLE DOC CLONE */
+        .document { 
+            background: white; 
+            width: 8.5in; 
+            min-height: 11in; 
+            padding: 1in; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.4); 
+            box-sizing: border-box; 
+            color: black;
+            font-family: "Times New Roman", Times, serif;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .doc-header {
+            text-align: center;
+            font-size: 18pt;
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 50px; /* Increased spacing to match doc */
+        }
+
+        .date-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 50px;
+        }
+
+        .date-container {
+            display: flex;
+            align-items: flex-end;
+            width: 2.8in;
+            font-size: 13pt;
+        }
+
+        .doc-row {
+            margin-bottom: 40px; /* Wider spacing between lines to match doc */
+            display: flex;
+            align-items: flex-end;
+            font-size: 13pt;
+        }
+
+        .doc-label {
+            font-weight: bold;
+            white-space: nowrap;
+            margin-right: 8px;
+        }
+
+        .doc-fill {
+            flex-grow: 1;
+            border-bottom: 1pt solid black;
+            min-height: 22px;
+            padding-left: 10px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 14pt;
+        }
+
+        .sig-box {
+            margin-top: 80px; /* Pushed down to match signature area in doc */
+            width: 3.5in;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sig-line {
+            border-bottom: 1.5pt solid black;
+            height: 30px;
+        }
+
+        .sig-text {
+            padding-top: 8px;
+            font-weight: bold;
+            font-size: 12pt;
+            text-align: center; /* Centered under the line */
+        }
+
+        .doc-footer { 
+            margin-top: auto; 
+            font-size: 11pt; 
+            line-height: 2.0; /* Increased line height for legibility */
+            font-family: "Times New Roman", Times, serif;
+        }
+
+        /* Print Formatting */
+        @media print {
+            @page { size: 8.5in 11in; margin: 0; }
+            body { background: white; }
+            .input-panel { display: none !important; }
+            .preview-panel { padding: 0; background: white; display: block; overflow: visible; }
+            .document { 
+                box-shadow: none !important; 
+                border: none !important; 
+                width: 8.5in !important; 
+                height: 11in !important;
+                margin: 0 auto !important;
+                padding: 1in !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="input-panel">
+        <h2>Check Request</h2>
+        <p class="instructions">Fill in the fields below. The document on the right is a 1:1 match of your Google Doc template.</p>
+        
+        <div class="input-group">
+            <label>Date</label>
+            <input type="text" id="in-date" placeholder="October 24, 2023" oninput="update('date', this.value)">
+        </div>
+
+        <div class="input-group">
+            <label>Issue Check To</label>
+            <input type="text" id="in-payee" oninput="update('payee', this.value)">
+        </div>
+
+        <div class="input-group">
+            <label>Amount ($)</label>
+            <input type="text" id="in-amount" placeholder="0.00" oninput="update('amount', this.value)">
+        </div>
+
+        <div class="input-group">
+            <label>From Account</label>
+            <input type="text" id="in-account" oninput="update('account', this.value)">
+        </div>
+
+        <div class="input-group">
+            <label>Reason</label>
+            <textarea id="in-reason" rows="3" oninput="update('reason', this.value)"></textarea>
+        </div>
+
+        <button class="print-btn" onclick="window.print()">PRINT COMPLETED FORM</button>
+    </div>
+
+    <div class="preview-panel">
+        <div class="document">
+            
+            <div class="doc-header">Hamilton High School West – Check Request Form</div>
+
+            <div class="date-row">
+                <div class="date-container">
+                    <span class="doc-label">Date:</span>
+                    <div id="out-date" class="doc-fill"></div>
+                </div>
+            </div>
+
+            <div class="doc-row">
+                <span class="doc-label">Please issue check to:</span>
+                <div id="out-payee" class="doc-fill"></div>
+            </div>
+
+            <div class="doc-row">
+                <span class="doc-label">In the amount of: $</span>
+                <div id="out-amount" class="doc-fill"></div>
+            </div>
+
+            <div class="doc-row">
+                <span class="doc-label">From my account:</span>
+                <div id="out-account" class="doc-fill"></div>
+            </div>
+
+            <div class="doc-row">
+                <span class="doc-label" style="align-self: flex-start;">Reason:</span>
+                <div id="out-reason" class="doc-fill" style="min-height: 60px;"></div>
+            </div>
+
+            <div class="sig-box">
+                <div class="sig-line"></div>
+                <div class="sig-text">Sponsor’s Signature</div>
+            </div>
+
+            <div class="doc-footer">
+                <strong>** All checks are subject to a 3-day minimum for issuance.</strong><br>
+                <strong>** If a check exceeds $150.00 you must have a signed Declaration by the vendor.</strong><br>
+                <strong>** If a check exceeds $250.00 you must have Principal Approval.</strong><br>
+                <strong>** A bill must be attached to this Form. (No Exceptions)</strong>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function update(id, val) {
+            document.getElementById('out-' + id).innerText = val;
+        }
+    </script>
+
+</body>
+</html>

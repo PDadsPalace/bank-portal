@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HHW Bank Portal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="portal-container no-print">
+        <h1>HHW Bank Portal</h1>
+        <nav class="portal-nav">
+            <button onclick="showForm('deposit')" class="active" id="btn-deposit">Deposit Slip</button>
+            <button onclick="showForm('check')" id="btn-check">Check Request</button>
+            <button onclick="showForm('history')" id="btn-history">History</button>
+        </nav>
+
+        <div id="deposit-form" class="form-section">
+            <h2>Fill Out Deposit Slip</h2>
+            <form>
+                <div class="form-group">
+                    <label>Date:</label>
+                    <input type="date" id="dep-date">
+                </div>
+                <div class="form-group">
+                    <label>Account Title:</label>
+                    <input type="text" id="dep-account">
+                </div>
+                <h3>Funds</h3>
+                <div class="finance-row">
+                    <label>Bills:</label> <input type="number" id="dep-bills" step="0.01" oninput="validateTotals()">
+                </div>
+                <div class="finance-row">
+                    <label>Coins:</label> <input type="number" id="dep-coins" step="0.01" oninput="validateTotals()">
+                </div>
+                 <div class="finance-row">
+                    <label>Checks (Count):</label> <input type="number" id="dep-chk-count" style="width: 50px; flex-grow: 0; margin-right: 5px;">
+                    <label>Total Check Amt:</label> <input type="number" id="dep-chk-amt" step="0.01" oninput="validateTotals()">
+                </div>
+
+                <div class="breakdown-container">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h4 style="margin: 0;">Source Breakdown</h4>
+                        <input type="file" id="csv-upload" accept=".csv" style="font-size: 12px; width: 220px;" onchange="handleCSVUpload(event)">
+                    </div>
+                    <div id="source-rows">
+                        <div class="source-item">
+                            <input type="text" placeholder="Description (e.g. Tickets)" class="src-desc" style="flex: 2;">
+                            <input type="number" placeholder="Amount" class="src-amt" step="0.01" oninput="validateTotals()" style="flex: 1;">
+                        </div>
+                    </div>
+                    <button type="button" class="add-btn" onclick="addSourceRow()">+ Add Source Line</button>
+                    <div id="match-status" class="status-msg">Match Status: $0.00</div>
+                </div>
+
+                <button type="button" class="print-btn" onclick="printDepositSlip()">Print Deposit Slip</button>
+            </form>
+        </div>
+
+        <div id="check-form" class="form-section" style="display: none;">
+            <h2>Fill Out Check Request</h2>
+            <form>
+                <div class="form-group">
+                    <label>Date:</label> <input type="date" id="chk-date">
+                </div>
+                <div class="form-group">
+                    <label>Pay To:</label> <input type="text" id="chk-payee">
+                </div>
+                <div class="form-group">
+                    <label>Amount ($):</label> <input type="number" id="chk-amount" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>From Account:</label> <input type="text" id="chk-account">
+                </div>
+                 <div class="form-group">
+                    <label>Reason:</label> <textarea id="chk-reason" rows="2"></textarea>
+                </div>
+                <button type="button" class="print-btn" onclick="printCheckRequest()">Print Check Request</button>
+            </form>
+        </div>
+
+        <div id="history-form" class="form-section" style="display: none;">
+            <h2>Submission History</h2>
+            <input type="text" id="history-search" placeholder="Search by date, name, or amount..." onkeyup="filterHistory()">
+            <div id="history-list"></div>
+            <button type="button" class="clear-btn" onclick="clearHistory()">Clear All History</button>
+        </div>
+    </div>
+
+    <div id="print-dep-overlay" class="print-overlay-container">
+        <img src="images/deposit_bg.png" class="form-bg-img">
+        <span id="ov-dep-date" class="overlay-field" style="top: 40.8%; left: 36%;"></span>
+        <span id="ov-dep-account" class="overlay-field" style="top: 47.9%; left: 36%;"></span>
+        <span id="ov-dep-bills" class="overlay-field ar" style="top: 66%; left: 55%; width: 260px;"></span>
+        <span id="ov-dep-coins" class="overlay-field ar" style="top: 73%; left: 55%; width: 260px;"></span>
+        <span id="ov-dep-chk-count" class="overlay-field ac" style="top: 79.5%; left: 43.5%; width: 40px;"></span>
+        <span id="ov-dep-chk-amt" class="overlay-field ar" style="top: 80%; left: 55%; width: 260px;"></span>
+        <span id="ov-dep-total" class="overlay-field ar" style="top: 87%; left: 55%; width: 260px; font-weight:bold;"></span>
+    </div>
+
+    <div id="print-chk-overlay" class="print-overlay-container">
+        <img src="images/check_bg.png" class="form-bg-img">
+        <span id="ov-chk-date" class="overlay-field" style="top: 39.5%; left: 35%;"></span>
+        <span id="ov-chk-payee" class="overlay-field" style="top: 46.5%; left: 35%;"></span>
+        <span id="ov-chk-amount" class="overlay-field" style="top: 53.5%; left: 35%;"></span>
+        <span id="ov-chk-account" class="overlay-field" style="top: 60.5%; left: 35%;"></span>
+        <span id="ov-chk-reason" class="overlay-field wrap" style="top: 68%; left: 35%; width: 55%; height: 40px;"></span>
+    </div>
+
+    <div id="print-breakdown-overlay" class="print-overlay-container second-page">
+        <div class="breakdown-print-content">
+            <h2 style="text-align: center; text-decoration: underline; margin-bottom: 40px;">Hamilton High School West - Deposit Breakdown</h2>
+            <div id="ov-breakdown-items"></div>
+            <div id="ov-breakdown-final-total" style="margin-top: 20px; text-align: right; font-weight: bold; font-size: 24px; border-top: 2px solid #000; padding-top: 10px;"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
