@@ -110,9 +110,17 @@
 
     <div id="print-breakdown-overlay" class="print-overlay-container second-page">
         <div class="breakdown-print-content">
-            <h2 style="text-align: center; text-decoration: underline; margin-bottom: 40px;">Hamilton High School West - Deposit Breakdown</h2>
-            <div id="ov-breakdown-items"></div>
-            <div id="ov-breakdown-final-total" style="margin-top: 20px; text-align: right; font-weight: bold; font-size: 24px; border-top: 2px solid #000; padding-top: 10px;"></div>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr><td colspan="2" style="height: 0.75in;"></td></tr>
+                    <tr><td colspan="2"><h2 style="text-align: center; text-decoration: underline; margin-bottom: 30px;">Hamilton High School West - Deposit Breakdown</h2></td></tr>
+                </thead>
+                <tbody id="ov-breakdown-items"></tbody>
+                <tfoot>
+                    <tr><td colspan="2" style="height: 0.75in;"></td></tr>
+                </tfoot>
+            </table>
+            <div id="ov-breakdown-final-total" style="margin-top: 10px; text-align: right; font-weight: bold; font-size: 24px; border-top: 2px solid #000; padding-top: 10px;"></div>
         </div>
     </div>
 

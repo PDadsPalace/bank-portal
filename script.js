@@ -41,7 +41,7 @@ function printDepositSlip() {
         const desc = el.querySelector('.src-desc').value;
         const amt = el.querySelector('.src-amt').value;
         if(desc || amt) {
-            bHtml += `<div class="br-row"><span>${desc}</span><span>$${parseFloat(amt || 0).toFixed(2)}</span></div>`;
+            bHtml += `<tr><td style="font-size: 20px; padding-bottom: 10px;">${desc}</td><td style="font-size: 20px; padding-bottom: 10px; text-align: right;">$${parseFloat(amt || 0).toFixed(2)}</td></tr>`;
         }
     });
     document.getElementById('ov-breakdown-items').innerHTML = bHtml;
